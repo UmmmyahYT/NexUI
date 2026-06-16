@@ -663,7 +663,7 @@ function NexUI:CreateWindow(config)
     PoweredByLabel.Parent           = WatermarkFrame
 
     local NexLogo = Instance.new("ImageLabel")
-    NexLogo.Image                  = "rbxassetid://72070585390420"
+    NexLogo.Image                  = "rbxassetid://136931370495154"
     NexLogo.Size                   = UDim2.new(0, 36, 0, 36)
     NexLogo.Position               = UDim2.new(0.5, -18, 0, 28)
     NexLogo.BackgroundTransparency = 1
