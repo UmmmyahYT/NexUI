@@ -633,12 +633,13 @@ function NexUI:CreateWindow(config)
 
     -- ── Watermark at bottom of sidebar ────────────────────────
     local WatermarkFrame = Instance.new("Frame")
-    WatermarkFrame.Size             = UDim2.new(1, 0, 0, 72)
+    WatermarkFrame.Size             = UDim2.new(0, SidebarW, 0, 72)
     WatermarkFrame.Position         = UDim2.new(0, 0, 1, -72)
     WatermarkFrame.BackgroundTransparency = 1
     WatermarkFrame.BorderSizePixel  = 0
     WatermarkFrame.ClipsDescendants = false
-    WatermarkFrame.Parent           = Sidebar
+    WatermarkFrame.ZIndex           = 5
+    WatermarkFrame.Parent           = Window  -- parented to Window, NOT Sidebar, so it is never clipped
 
     -- Fade line above watermark
     local WatermarkLine = Instance.new("Frame")
@@ -646,6 +647,7 @@ function NexUI:CreateWindow(config)
     WatermarkLine.Position         = UDim2.new(0, 10, 0, 0)
     WatermarkLine.BackgroundColor3 = Theme.Border
     WatermarkLine.BorderSizePixel  = 0
+    WatermarkLine.ZIndex           = 5
     WatermarkLine.Parent           = WatermarkFrame
 
     local PoweredByLabel = Instance.new("TextLabel")
@@ -657,16 +659,19 @@ function NexUI:CreateWindow(config)
     PoweredByLabel.Size             = UDim2.new(1, 0, 0, 16)
     PoweredByLabel.Position         = UDim2.new(0, 0, 0, 10)
     PoweredByLabel.TextXAlignment   = Enum.TextXAlignment.Center
+    PoweredByLabel.ZIndex           = 5
     PoweredByLabel.Parent           = WatermarkFrame
 
     local NexLogo = Instance.new("ImageLabel")
-    NexLogo.Image               = "rbxassetid://72070585390420"
-    NexLogo.Size                = UDim2.new(0, 36, 0, 36)
-    NexLogo.Position            = UDim2.new(0.5, -18, 0, 28)
+    NexLogo.Image                  = "rbxassetid://72070585390420"
+    NexLogo.Size                   = UDim2.new(0, 36, 0, 36)
+    NexLogo.Position               = UDim2.new(0.5, -18, 0, 28)
     NexLogo.BackgroundTransparency = 1
-    NexLogo.ImageColor3         = Theme.Accent
-    NexLogo.BorderSizePixel     = 0
-    NexLogo.Parent              = WatermarkFrame
+    NexLogo.ImageColor3            = Theme.White  -- white so the image is always visible regardless of what the asset looks like
+    NexLogo.ScaleType              = Enum.ScaleType.Fit
+    NexLogo.BorderSizePixel        = 0
+    NexLogo.ZIndex                 = 5
+    NexLogo.Parent                 = WatermarkFrame
 
     -- ── Content Area ──────────────────────────────────────────
     local ContentArea = Instance.new("Frame")
