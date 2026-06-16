@@ -6,7 +6,7 @@
     ██║ ╚████║███████╗██╔╝ ██╗╚██████╔╝██║
     ╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚═╝
 
-    NexUI v1.0 — Roblox Script Menu Framework
+    NexUI v1.05 — Roblox Script Menu Framework
     A loadstring-compatible UI library for building clean, tabbed script menus.
 
     USAGE:
@@ -626,7 +626,7 @@ function NexUI:CreateWindow(config)
         local TFLayout = Instance.new("UIListLayout")
         TFLayout.SortOrder        = Enum.SortOrder.LayoutOrder
         TFLayout.FillDirection    = Enum.FillDirection.Vertical
-        TFLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+        TFLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left
         TFLayout.Padding          = UDim.new(0, 6)
         TFLayout.Parent           = TabFrame
 
@@ -697,9 +697,6 @@ function NexUI:CreateWindow(config)
             cfg = cfg or {}
             local sectionName = cfg.Name or "Section"
 
-            local container = MakeContainer(TabFrame)
-            container.LayoutOrder = nextOrder(self)
-
             local headerLabel = Instance.new("TextLabel")
             headerLabel.Text            = string.upper(sectionName)
             headerLabel.Font            = Enum.Font.GothamBold
@@ -707,25 +704,12 @@ function NexUI:CreateWindow(config)
             headerLabel.TextColor3      = Theme.TextMuted
             headerLabel.TextXAlignment  = Enum.TextXAlignment.Left
             headerLabel.BackgroundTransparency = 1
-            headerLabel.Size            = UDim2.new(1, 0, 0, 18)
-            headerLabel.LetterSpacing   = 3
-            headerLabel.Parent          = container
-
-            -- Underline
-            local underline = Instance.new("Frame")
-            underline.Size             = UDim2.new(1, 0, 0, 1)
-            underline.Position         = UDim2.new(0, 0, 0, 18)
-            underline.BackgroundColor3 = Theme.Border
-            underline.BorderSizePixel  = 0
-            underline.Parent           = container
+            headerLabel.Size            = UDim2.new(1, 0, 0, 20)
+            headerLabel.LayoutOrder     = nextOrder(self)
+            headerLabel.Parent          = TabFrame
 
             local SectionObj = {}
-            SectionObj._container = container
-
-            function SectionObj:Destroy()
-                SafeDestroy(container)
-            end
-
+            function SectionObj:Destroy() SafeDestroy(headerLabel) end
             return SectionObj
         end
 
