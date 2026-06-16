@@ -673,6 +673,20 @@ function NexUI:CreateWindow(config)
     NexLogo.ZIndex                 = 20
     NexLogo.Parent                 = WatermarkFrame
 
+    -- Resolve decal -> texture asynchronously
+    task.spawn(function()
+        local ok, result = pcall(function()
+            return game:GetService("InsertService"):LoadAsset(136931370495154)
+        end)
+        if ok and result then
+            local decal = result:FindFirstChildWhichIsA("Decal", true)
+            if decal then
+                NexLogo.Image = decal.Texture
+            end
+            result:Destroy()
+        end
+    end)
+
     -- ── Content Area ──────────────────────────────────────────
     local ContentArea = Instance.new("Frame")
     ContentArea.Name             = "ContentArea"
