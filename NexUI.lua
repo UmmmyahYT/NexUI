@@ -663,29 +663,19 @@ function NexUI:CreateWindow(config)
     PoweredByLabel.Parent           = WatermarkFrame
 
     local NexLogo = Instance.new("ImageLabel")
-    NexLogo.Image                  = "rbxassetid://136931370495154"
+    NexLogo.Image                  = "rbxthumb://type=Asset&id=136931370495154&w=150&h=150"
     NexLogo.Size                   = UDim2.new(0, 36, 0, 36)
     NexLogo.Position               = UDim2.new(0.5, -18, 0, 28)
-    NexLogo.BackgroundTransparency = 1
+    NexLogo.BackgroundColor3       = Theme.AccentDim
+    NexLogo.BackgroundTransparency = 0.5
     NexLogo.ImageColor3            = Theme.White
     NexLogo.ScaleType              = Enum.ScaleType.Fit
     NexLogo.BorderSizePixel        = 0
     NexLogo.ZIndex                 = 20
     NexLogo.Parent                 = WatermarkFrame
-
-    -- Resolve decal -> texture asynchronously
-    task.spawn(function()
-        local ok, result = pcall(function()
-            return game:GetService("InsertService"):LoadAsset(136931370495154)
-        end)
-        if ok and result then
-            local decal = result:FindFirstChildWhichIsA("Decal", true)
-            if decal then
-                NexLogo.Image = decal.Texture
-            end
-            result:Destroy()
-        end
-    end)
+    local NexLogoCorner = Instance.new("UICorner")
+    NexLogoCorner.CornerRadius = UDim.new(0, 6)
+    NexLogoCorner.Parent = NexLogo
 
     -- ── Content Area ──────────────────────────────────────────
     local ContentArea = Instance.new("Frame")
