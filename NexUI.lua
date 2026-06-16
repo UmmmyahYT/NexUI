@@ -6,7 +6,7 @@
     ██║ ╚████║███████╗██╔╝ ██╗╚██████╔╝██║
     ╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚═╝
 
-    NexUI v1.05 — Roblox Script Menu Framework
+    NexUI v1.0 — Roblox Script Menu Framework
     A loadstring-compatible UI library for building clean, tabbed script menus.
 
     USAGE:
@@ -127,7 +127,7 @@ local Theme = {
     SliderFill    = Color3.fromRGB(99,  102, 241),
     SliderTrack   = Color3.fromRGB(35,  35,  50),
     TabActive     = Color3.fromRGB(99,  102, 241),
-    TabInactive   = Color3.fromRGB(35,  35,  50),
+    TabInactive   = Color3.fromRGB(30,  30,  44),
     SectionBg     = Color3.fromRGB(18,  18,  26),
 
     -- Misc
@@ -506,14 +506,6 @@ function NexUI:CreateWindow(config)
     local TabBarCorner = Instance.new("UICorner")
     TabBarCorner.CornerRadius = UDim.new(0, 10)
     TabBarCorner.Parent = TabBar
-
-    -- Cover right rounded corners
-    local TabBarFill = Instance.new("Frame")
-    TabBarFill.Size            = UDim2.new(0, 10, 1, 0)
-    TabBarFill.Position        = UDim2.new(1, -10, 0, 0)
-    TabBarFill.BackgroundColor3 = Theme.Surface
-    TabBarFill.BorderSizePixel  = 0
-    TabBarFill.Parent           = TabBar
 
     local TabList = Instance.new("UIListLayout")
     TabList.SortOrder         = Enum.SortOrder.LayoutOrder
