@@ -560,47 +560,30 @@ function NexUI:CreateWindow(config)
 
         -- Tab button
         local TabBtn = Instance.new("TextButton")
-        TabBtn.Name             = "Tab_" .. tabName
-        TabBtn.Text             = ""
-        TabBtn.BackgroundColor3 = Theme.TabInactive
-        TabBtn.BorderSizePixel  = 0
-        TabBtn.Size             = UDim2.new(1, 0, 0, 34)
-        TabBtn.AutoButtonColor  = false
-        TabBtn.LayoutOrder      = order
-        TabBtn.Parent           = TabBar
+        TabBtn.Name              = "Tab_" .. tabName
+        TabBtn.Text              = tabName
+        TabBtn.Font              = Enum.Font.Gotham
+        TabBtn.TextSize          = 12
+        TabBtn.TextColor3        = Theme.TextSecondary
+        TabBtn.TextXAlignment    = Enum.TextXAlignment.Left
+        TabBtn.TextTruncate      = Enum.TextTruncate.AtEnd
+        TabBtn.BackgroundColor3  = Color3.fromRGB(32, 32, 45)
+        TabBtn.BorderSizePixel   = 0
+        TabBtn.Size              = UDim2.new(1, 0, 0, 34)
+        TabBtn.AutoButtonColor   = false
+        TabBtn.LayoutOrder       = order
+        TabBtn.Parent            = TabBar
 
         local TBCorner = Instance.new("UICorner")
         TBCorner.CornerRadius = UDim.new(0, 7)
         TBCorner.Parent       = TabBtn
 
-        local TBLayout = Instance.new("UIListLayout")
-        TBLayout.FillDirection  = Enum.FillDirection.Horizontal
-        TBLayout.VerticalAlignment = Enum.VerticalAlignment.Center
-        TBLayout.Padding        = UDim.new(0, 6)
-        TBLayout.Parent         = TabBtn
-
         local TBPad = Instance.new("UIPadding")
-        TBPad.PaddingLeft = UDim.new(0, 9)
-        TBPad.Parent = TabBtn
+        TBPad.PaddingLeft  = UDim.new(0, 10)
+        TBPad.PaddingRight = UDim.new(0, 6)
+        TBPad.Parent       = TabBtn
 
-        if tabIcon then
-            local icon = Instance.new("ImageLabel")
-            icon.Size                 = UDim2.new(0, 16, 0, 16)
-            icon.BackgroundTransparency = 1
-            icon.Image                = tabIcon
-            icon.ImageColor3          = Theme.TextMuted
-            icon.Parent               = TabBtn
-        end
-
-        local TBLabel = Instance.new("TextLabel")
-        TBLabel.Text              = tabName
-        TBLabel.Font              = Enum.Font.Gotham
-        TBLabel.TextSize          = 12
-        TBLabel.TextColor3        = Theme.TextMuted
-        TBLabel.BackgroundTransparency = 1
-        TBLabel.Size              = UDim2.new(1, -30, 1, 0)
-        TBLabel.TextXAlignment    = Enum.TextXAlignment.Left
-        TBLabel.Parent            = TabBtn
+        local TBLabel = TabBtn  -- reference for colour/font changes
 
         -- Tab Content Frame
         local TabFrame = Instance.new("ScrollingFrame")
@@ -643,19 +626,17 @@ function NexUI:CreateWindow(config)
 
         -- Activate
         local function activateTab(tab)
-            -- Deactivate all
             for _, t in ipairs(WindowObj._tabs) do
-                t._frame.Visible = false
-                Tween(t._button, { BackgroundColor3 = Theme.TabInactive }, 0.15)
-                t._label.TextColor3 = Theme.TextMuted
-                t._label.Font       = Enum.Font.Gotham
+                t._frame.Visible        = false
+                t._button.BackgroundColor3 = Color3.fromRGB(32, 32, 45)
+                t._button.TextColor3    = Theme.TextSecondary
+                t._button.Font          = Enum.Font.Gotham
             end
-            -- Activate selected
-            tab._frame.Visible = true
-            Tween(tab._button, { BackgroundColor3 = Theme.TabActive }, 0.15)
-            tab._label.TextColor3 = Theme.TextPrimary
-            tab._label.Font       = Enum.Font.GothamBold
-            WindowObj._activeTab  = tab
+            tab._frame.Visible          = true
+            tab._button.BackgroundColor3 = Theme.Accent
+            tab._button.TextColor3      = Theme.White
+            tab._button.Font            = Enum.Font.GothamBold
+            WindowObj._activeTab        = tab
         end
 
         TabBtn.MouseButton1Click:Connect(function()
@@ -664,12 +645,12 @@ function NexUI:CreateWindow(config)
 
         TabBtn.MouseEnter:Connect(function()
             if WindowObj._activeTab ~= TabObj then
-                Tween(TabBtn, { BackgroundColor3 = Theme.SurfaceHover }, 0.1)
+                TabBtn.BackgroundColor3 = Color3.fromRGB(45, 45, 62)
             end
         end)
         TabBtn.MouseLeave:Connect(function()
             if WindowObj._activeTab ~= TabObj then
-                Tween(TabBtn, { BackgroundColor3 = Theme.TabInactive }, 0.1)
+                TabBtn.BackgroundColor3 = Color3.fromRGB(32, 32, 45)
             end
         end)
 
