@@ -612,7 +612,7 @@ function NexUI:CreateWindow(config)
     -- Tab list inside sidebar
     local TabBar = Instance.new("Frame")
     TabBar.Name                    = "TabBar"
-    TabBar.Size                    = UDim2.new(1, 0, 1, -80) -- leave room for watermark at bottom
+    TabBar.Size                    = UDim2.new(1, 0, 1, -112) -- leave room for watermark at bottom
     TabBar.BackgroundTransparency  = 1
     TabBar.BorderSizePixel         = 0
     TabBar.ClipsDescendants        = false
@@ -633,8 +633,8 @@ function NexUI:CreateWindow(config)
 
     -- ── Watermark at bottom of sidebar ────────────────────────
     local WatermarkFrame = Instance.new("Frame")
-    WatermarkFrame.Size             = UDim2.new(0, SidebarW, 0, 72)
-    WatermarkFrame.Position         = UDim2.new(0, 0, 1, -72)
+    WatermarkFrame.Size             = UDim2.new(0, SidebarW, 0, 104)
+    WatermarkFrame.Position         = UDim2.new(0, 0, 1, -104)
     WatermarkFrame.BackgroundTransparency = 1
     WatermarkFrame.BorderSizePixel  = 0
     WatermarkFrame.ClipsDescendants = false
@@ -664,10 +664,9 @@ function NexUI:CreateWindow(config)
 
     local NexLogo = Instance.new("ImageLabel")
     NexLogo.Image                  = "rbxthumb://type=Asset&id=136931370495154&w=150&h=150"
-    NexLogo.Size                   = UDim2.new(0, 36, 0, 36)
-    NexLogo.Position               = UDim2.new(0.5, -18, 0, 28)
-    NexLogo.BackgroundColor3       = Theme.AccentDim
-    NexLogo.BackgroundTransparency = 0.5
+    NexLogo.Size                   = UDim2.new(0, 72, 0, 72)
+    NexLogo.Position               = UDim2.new(0.5, -36, 0, 24)
+    NexLogo.BackgroundTransparency = 1
     NexLogo.ImageColor3            = Theme.White
     NexLogo.ScaleType              = Enum.ScaleType.Fit
     NexLogo.BorderSizePixel        = 0
