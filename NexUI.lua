@@ -103,35 +103,34 @@ end
 
 local Theme = {
     -- Window
-    Background    = Color3.fromRGB(15,  15,  20),
-    Surface       = Color3.fromRGB(22,  22,  30),
-    SurfaceHover  = Color3.fromRGB(28,  28,  38),
-    Border        = Color3.fromRGB(45,  45,  60),
-    BorderActive  = Color3.fromRGB(80,  80, 110),
+    Background    = Color3.fromRGB(10,  10,  16),
+    Surface       = Color3.fromRGB(16,  16,  26),
+    SurfaceHover  = Color3.fromRGB(24,  24,  38),
+    Border        = Color3.fromRGB(38,  38,  58),
+    BorderActive  = Color3.fromRGB(99, 102, 241),
 
     -- Accent
-    Accent        = Color3.fromRGB(99,  102, 241),   -- Indigo-500
+    Accent        = Color3.fromRGB(99,  102, 241),
     AccentHover   = Color3.fromRGB(129, 132, 255),
-    AccentDim     = Color3.fromRGB(45,  47, 110),
+    AccentDim     = Color3.fromRGB(30,  32,  80),
+    AccentGlow    = Color3.fromRGB(60,  63, 180),
 
     -- Text
-    TextPrimary   = Color3.fromRGB(240, 240, 255),
-    TextSecondary = Color3.fromRGB(140, 140, 170),
-    TextMuted     = Color3.fromRGB(80,  80, 110),
+    TextPrimary   = Color3.fromRGB(235, 235, 255),
+    TextSecondary = Color3.fromRGB(130, 130, 165),
+    TextMuted     = Color3.fromRGB(65,  65, 100),
     TextDanger    = Color3.fromRGB(248, 113, 113),
 
     -- Components
-    ToggleOff     = Color3.fromRGB(50,  50,  70),
+    ToggleOff     = Color3.fromRGB(40,  40,  62),
     ToggleOn      = Color3.fromRGB(99,  102, 241),
-    InputBg       = Color3.fromRGB(12,  12,  18),
+    InputBg       = Color3.fromRGB(8,   8,   14),
     SliderFill    = Color3.fromRGB(99,  102, 241),
-    SliderTrack   = Color3.fromRGB(35,  35,  50),
-    TabActive     = Color3.fromRGB(99,  102, 241),
-    TabInactive   = Color3.fromRGB(30,  30,  44),
-    SectionBg     = Color3.fromRGB(18,  18,  26),
+    SliderTrack   = Color3.fromRGB(28,  28,  44),
+    SectionBg     = Color3.fromRGB(14,  14,  22),
+    SidebarBg     = Color3.fromRGB(13,  13,  20),
 
     -- Misc
-    Shadow        = Color3.fromRGB(0,   0,   0),
     White         = Color3.fromRGB(255, 255, 255),
     Danger        = Color3.fromRGB(239, 68,  68),
     Success       = Color3.fromRGB(34,  197, 94),
@@ -350,55 +349,128 @@ function NexUI:CreateWindow(config)
     local minSize        = config.MinSize  or Vector2.new(420, 300)
 
     -- ── Main Window Frame ──────────────────────────────────────
+    -- Start hidden + shifted down for open animation
     local Window = Instance.new("Frame")
     Window.Name              = "NexUI_Window"
     Window.Size              = UDim2.new(0, size.X, 0, size.Y)
-    Window.Position          = position
+    Window.Position          = UDim2.new(position.X.Scale, position.X.Offset, position.Y.Scale, position.Y.Offset + 18)
     Window.BackgroundColor3  = Theme.Background
+    Window.BackgroundTransparency = 1
     Window.BorderSizePixel   = 0
     Window.ClipsDescendants  = false
     Window.Parent            = Root
 
     local WCorner = Instance.new("UICorner")
-    WCorner.CornerRadius = UDim.new(0, 10)
+    WCorner.CornerRadius = UDim.new(0, 12)
     WCorner.Parent = Window
 
+    -- Outer glow border
     local WStroke = Instance.new("UIStroke")
-    WStroke.Color     = Theme.Border
-    WStroke.Thickness = 1
+    WStroke.Color     = Theme.AccentGlow
+    WStroke.Thickness = 1.5
+    WStroke.Transparency = 0.6
     WStroke.Parent    = Window
+
+    -- ── Thin accent gradient line across very top ──────────────
+    local TopBar = Instance.new("Frame")
+    TopBar.Name             = "TopBar"
+    TopBar.Size             = UDim2.new(1, 0, 0, 2)
+    TopBar.Position         = UDim2.new(0, 0, 0, 0)
+    TopBar.BackgroundColor3 = Theme.Accent
+    TopBar.BorderSizePixel  = 0
+    TopBar.ZIndex           = 10
+    TopBar.Parent           = Window
+
+    local TopBarCorner = Instance.new("UICorner")
+    TopBarCorner.CornerRadius = UDim.new(0, 12)
+    TopBarCorner.Parent = TopBar
+
+    -- Cover the bottom rounded part of the top bar (it only rounds top)
+    local TopBarFill = Instance.new("Frame")
+    TopBarFill.Size             = UDim2.new(1, 0, 0, 8)
+    TopBarFill.Position         = UDim2.new(0, 0, 1, -6)
+    TopBarFill.BackgroundColor3 = Theme.Accent
+    TopBarFill.BorderSizePixel  = 0
+    TopBarFill.ZIndex           = 10
+    TopBarFill.Parent           = TopBar
+
+    -- Shimmer element that sweeps across the top bar on open
+    local Shimmer = Instance.new("Frame")
+    Shimmer.Name             = "Shimmer"
+    Shimmer.Size             = UDim2.new(0, 60, 1, 0)
+    Shimmer.Position         = UDim2.new(-0.15, 0, 0, 0)
+    Shimmer.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    Shimmer.BackgroundTransparency = 0.6
+    Shimmer.BorderSizePixel  = 0
+    Shimmer.ZIndex           = 11
+    Shimmer.ClipsDescendants = false
+    Shimmer.Parent           = TopBar
+
+    local ShimGrad = Instance.new("UIGradient")
+    ShimGrad.Transparency = NumberSequence.new({
+        NumberSequenceKeypoint.new(0, 1),
+        NumberSequenceKeypoint.new(0.5, 0),
+        NumberSequenceKeypoint.new(1, 1),
+    })
+    ShimGrad.Rotation = 0
+    ShimGrad.Parent   = Shimmer
 
     -- ── Title Bar ─────────────────────────────────────────────
     local TitleBar = Instance.new("Frame")
-    TitleBar.Name            = "TitleBar"
-    TitleBar.Size            = UDim2.new(1, 0, 0, 48)
+    TitleBar.Name             = "TitleBar"
+    TitleBar.Size             = UDim2.new(1, 0, 0, 50)
+    TitleBar.Position         = UDim2.new(0, 0, 0, 2) -- sits below the 2px accent line
     TitleBar.BackgroundColor3 = Theme.Surface
-    TitleBar.BorderSizePixel = 0
-    TitleBar.ZIndex          = 2
-    TitleBar.Parent          = Window
+    TitleBar.BorderSizePixel  = 0
+    TitleBar.ZIndex           = 2
+    TitleBar.Parent           = Window
 
-    local TitleCorner = Instance.new("UICorner")
-    TitleCorner.CornerRadius = UDim.new(0, 10)
-    TitleCorner.Parent       = TitleBar
-
-    -- Cover bottom rounded corners of titlebar
+    -- Square off the bottom of the titlebar
     local TitleFill = Instance.new("Frame")
-    TitleFill.Size            = UDim2.new(1, 0, 0, 10)
-    TitleFill.Position        = UDim2.new(0, 0, 1, -10)
+    TitleFill.Size             = UDim2.new(1, 0, 0, 12)
+    TitleFill.Position         = UDim2.new(0, 0, 1, -12)
     TitleFill.BackgroundColor3 = Theme.Surface
     TitleFill.BorderSizePixel  = 0
+    TitleFill.ZIndex           = 2
     TitleFill.Parent           = TitleBar
 
-    -- Accent dot
-    local AccentDot = Instance.new("Frame")
-    AccentDot.Size            = UDim2.new(0, 8, 0, 8)
-    AccentDot.Position        = UDim2.new(0, 14, 0.5, -4)
-    AccentDot.BackgroundColor3 = Theme.Accent
-    AccentDot.BorderSizePixel  = 0
-    AccentDot.Parent           = TitleBar
-    local ADCorner = Instance.new("UICorner")
-    ADCorner.CornerRadius = UDim.new(1, 0)
-    ADCorner.Parent = AccentDot
+    local TitleCorner = Instance.new("UICorner")
+    TitleCorner.CornerRadius = UDim.new(0, 12)
+    TitleCorner.Parent       = TitleBar
+
+    -- Subtle bottom border on titlebar
+    local TitleBorder = Instance.new("Frame")
+    TitleBorder.Size             = UDim2.new(1, -24, 0, 1)
+    TitleBorder.Position         = UDim2.new(0, 12, 1, -1)
+    TitleBorder.BackgroundColor3 = Theme.Border
+    TitleBorder.BorderSizePixel  = 0
+    TitleBorder.ZIndex           = 3
+    TitleBorder.Parent           = TitleBar
+
+    -- Title icon (small accent square with rounded corners)
+    local TitleIcon = Instance.new("Frame")
+    TitleIcon.Size             = UDim2.new(0, 20, 0, 20)
+    TitleIcon.Position         = UDim2.new(0, 14, 0.5, -10)
+    TitleIcon.BackgroundColor3 = Theme.Accent
+    TitleIcon.BorderSizePixel  = 0
+    TitleIcon.ZIndex           = 3
+    TitleIcon.Parent           = TitleBar
+    local TIc = Instance.new("UICorner"); TIc.CornerRadius = UDim.new(0, 5); TIc.Parent = TitleIcon
+    -- Inner check/line on the icon
+    local TILine = Instance.new("Frame")
+    TILine.Size             = UDim2.new(0, 8, 0, 2)
+    TILine.Position         = UDim2.new(0.5, -4, 0.5, -1)
+    TILine.BackgroundColor3 = Theme.White
+    TILine.BorderSizePixel  = 0
+    TILine.ZIndex           = 4
+    TILine.Parent           = TitleIcon
+    local TILine2 = Instance.new("Frame")
+    TILine2.Size             = UDim2.new(0, 2, 0, 8)
+    TILine2.Position         = UDim2.new(0.5, -1, 0.5, -4)
+    TILine2.BackgroundColor3 = Theme.White
+    TILine2.BorderSizePixel  = 0
+    TILine2.ZIndex           = 4
+    TILine2.Parent           = TitleIcon
 
     -- Title text
     local TitleText = Instance.new("TextLabel")
@@ -408,75 +480,86 @@ function NexUI:CreateWindow(config)
     TitleText.TextColor3     = Theme.TextPrimary
     TitleText.TextXAlignment = Enum.TextXAlignment.Left
     TitleText.BackgroundTransparency = 1
-    TitleText.Size           = UDim2.new(0, 220, 1, 0)
-    TitleText.Position       = UDim2.new(0, 28, 0, 0)
+    TitleText.Size           = UDim2.new(0, 200, 1, 0)
+    TitleText.Position       = UDim2.new(0, 42, 0, 0)
+    TitleText.ZIndex         = 3
     TitleText.Parent         = TitleBar
 
-    -- Subtitle
+    -- Subtitle pill
     if windowSubtitle ~= "" then
+        local SubPill = Instance.new("Frame")
+        SubPill.BackgroundColor3 = Theme.AccentDim
+        SubPill.BorderSizePixel  = 0
+        SubPill.Size             = UDim2.new(0, 0, 0, 20)
+        SubPill.AutomaticSize    = Enum.AutomaticSize.X
+        SubPill.Position         = UDim2.new(0, 42, 0.5, -10)
+        SubPill.AnchorPoint      = Vector2.new(0, 0)
+        SubPill.ZIndex           = 3
+        SubPill.Parent           = TitleBar
+
+        -- Position it after the title text (approx)
+        SubPill.Position = UDim2.new(0, 42 + string.len(windowTitle) * 9, 0.5, -10)
+
+        local SubPillCorner = Instance.new("UICorner")
+        SubPillCorner.CornerRadius = UDim.new(1, 0)
+        SubPillCorner.Parent = SubPill
+
+        local SubPillPad = Instance.new("UIPadding")
+        SubPillPad.PaddingLeft  = UDim.new(0, 8)
+        SubPillPad.PaddingRight = UDim.new(0, 8)
+        SubPillPad.Parent       = SubPill
+
         local SubText = Instance.new("TextLabel")
-        SubText.Text            = windowSubtitle
-        SubText.Font            = Enum.Font.Gotham
-        SubText.TextSize        = 11
-        SubText.TextColor3      = Theme.TextMuted
-        SubText.TextXAlignment  = Enum.TextXAlignment.Right
+        SubText.Text             = windowSubtitle
+        SubText.Font             = Enum.Font.GothamBold
+        SubText.TextSize         = 10
+        SubText.TextColor3       = Theme.Accent
         SubText.BackgroundTransparency = 1
-        SubText.Size            = UDim2.new(0, 160, 1, 0)
-        SubText.Position        = UDim2.new(1, -220, 0, 0)
-        SubText.Parent          = TitleBar
+        SubText.Size             = UDim2.new(1, 0, 1, 0)
+        SubText.TextXAlignment   = Enum.TextXAlignment.Center
+        SubText.ZIndex           = 4
+        SubText.Parent           = SubPill
     end
 
-    -- Close button
-    local CloseBtn = Instance.new("TextButton")
-    CloseBtn.Text            = "✕"
-    CloseBtn.Font            = Enum.Font.GothamBold
-    CloseBtn.TextSize        = 12
-    CloseBtn.TextColor3      = Theme.TextMuted
-    CloseBtn.BackgroundColor3 = Theme.Background
-    CloseBtn.BorderSizePixel = 0
-    CloseBtn.Size            = UDim2.new(0, 28, 0, 28)
-    CloseBtn.Position        = UDim2.new(1, -38, 0.5, -14)
-    CloseBtn.ZIndex          = 3
-    CloseBtn.Parent          = TitleBar
+    -- Window control buttons (close + minimize) — right side
+    local function MakeControlBtn(symbol, xOffset)
+        local btn = Instance.new("TextButton")
+        btn.Text             = symbol
+        btn.Font             = Enum.Font.GothamBold
+        btn.TextSize         = 11
+        btn.TextColor3       = Theme.TextMuted
+        btn.BackgroundColor3 = Theme.SurfaceHover
+        btn.BorderSizePixel  = 0
+        btn.AutoButtonColor  = false
+        btn.Size             = UDim2.new(0, 26, 0, 26)
+        btn.Position         = UDim2.new(1, xOffset, 0.5, -13)
+        btn.ZIndex           = 5
+        btn.Parent           = TitleBar
+        local c = Instance.new("UICorner"); c.CornerRadius = UDim.new(1, 0); c.Parent = btn
+        return btn
+    end
 
-    local CloseBtnCorner = Instance.new("UICorner")
-    CloseBtnCorner.CornerRadius = UDim.new(0, 6)
-    CloseBtnCorner.Parent = CloseBtn
+    local CloseBtn = MakeControlBtn("✕", -36)
+    local MinBtn   = MakeControlBtn("─", -66)
 
     CloseBtn.MouseEnter:Connect(function()
-        Tween(CloseBtn, { BackgroundColor3 = Theme.Danger, TextColor3 = Theme.White }, 0.15)
+        Tween(CloseBtn, { BackgroundColor3 = Theme.Danger, TextColor3 = Theme.White }, 0.12)
     end)
     CloseBtn.MouseLeave:Connect(function()
-        Tween(CloseBtn, { BackgroundColor3 = Theme.Background, TextColor3 = Theme.TextMuted }, 0.15)
+        Tween(CloseBtn, { BackgroundColor3 = Theme.SurfaceHover, TextColor3 = Theme.TextMuted }, 0.12)
     end)
     CloseBtn.MouseButton1Click:Connect(function()
-        Tween(Window, { BackgroundTransparency = 1 }, 0.2)
-        task.wait(0.25)
+        -- Close animation: shrink + fade
+        Tween(Window, { Size = UDim2.new(0, size.X, 0, 0), BackgroundTransparency = 1 }, 0.25, Enum.EasingStyle.Quint)
+        task.wait(0.28)
         SafeDestroy(Window)
     end)
 
-    -- Minimize button
-    local MinBtn = Instance.new("TextButton")
-    MinBtn.Text             = "─"
-    MinBtn.Font             = Enum.Font.GothamBold
-    MinBtn.TextSize         = 12
-    MinBtn.TextColor3       = Theme.TextMuted
-    MinBtn.BackgroundColor3 = Theme.Background
-    MinBtn.BorderSizePixel  = 0
-    MinBtn.Size             = UDim2.new(0, 28, 0, 28)
-    MinBtn.Position         = UDim2.new(1, -70, 0.5, -14)
-    MinBtn.ZIndex           = 3
-    MinBtn.Parent           = TitleBar
-
-    local MinBtnCorner = Instance.new("UICorner")
-    MinBtnCorner.CornerRadius = UDim.new(0, 6)
-    MinBtnCorner.Parent = MinBtn
-
     MinBtn.MouseEnter:Connect(function()
-        Tween(MinBtn, { BackgroundColor3 = Theme.AccentDim }, 0.15)
+        Tween(MinBtn, { BackgroundColor3 = Theme.AccentDim, TextColor3 = Theme.Accent }, 0.12)
     end)
     MinBtn.MouseLeave:Connect(function()
-        Tween(MinBtn, { BackgroundColor3 = Theme.Background }, 0.15)
+        Tween(MinBtn, { BackgroundColor3 = Theme.SurfaceHover, TextColor3 = Theme.TextMuted }, 0.12)
     end)
 
     local minimized = false
@@ -485,57 +568,133 @@ function NexUI:CreateWindow(config)
         minimized = not minimized
         if minimized then
             prevSize = Window.Size
-            Tween(Window, { Size = UDim2.new(0, size.X, 0, 48) }, 0.25, Enum.EasingStyle.Quint)
+            Tween(Window, { Size = UDim2.new(0, size.X, 0, 52) }, 0.3, Enum.EasingStyle.Quint)
         else
-            Tween(Window, { Size = prevSize }, 0.25, Enum.EasingStyle.Quint)
+            Tween(Window, { Size = prevSize }, 0.3, Enum.EasingStyle.Quint)
         end
     end)
 
     MakeDraggable(TitleBar, Window)
 
-    -- ── Tab Bar ───────────────────────────────────────────────
-    local TabBar = Instance.new("Frame")
-    TabBar.Name              = "TabBar"
-    TabBar.Size              = UDim2.new(0, 130, 1, -48)
-    TabBar.Position          = UDim2.new(0, 0, 0, 48)
-    TabBar.BackgroundColor3  = Theme.Surface
-    TabBar.BorderSizePixel   = 0
-    TabBar.ClipsDescendants  = true
-    TabBar.Parent            = Window
+    -- ── Sidebar ───────────────────────────────────────────────
+    local SidebarW = 148
 
-    local TabBarCorner = Instance.new("UICorner")
-    TabBarCorner.CornerRadius = UDim.new(0, 10)
-    TabBarCorner.Parent = TabBar
+    local Sidebar = Instance.new("Frame")
+    Sidebar.Name              = "Sidebar"
+    Sidebar.Size              = UDim2.new(0, SidebarW, 1, -52)
+    Sidebar.Position          = UDim2.new(0, 0, 0, 52)
+    Sidebar.BackgroundColor3  = Theme.SidebarBg
+    Sidebar.BorderSizePixel   = 0
+    Sidebar.ClipsDescendants  = true
+    Sidebar.ZIndex            = 2
+    Sidebar.Parent            = Window
+
+    -- Square off the top-left
+    local SidebarTopFill = Instance.new("Frame")
+    SidebarTopFill.Size             = UDim2.new(1, 0, 0, 10)
+    SidebarTopFill.BackgroundColor3 = Theme.SidebarBg
+    SidebarTopFill.BorderSizePixel  = 0
+    SidebarTopFill.ZIndex           = 2
+    SidebarTopFill.Parent           = Sidebar
+
+    local SidebarCorner = Instance.new("UICorner")
+    SidebarCorner.CornerRadius = UDim.new(0, 12)
+    SidebarCorner.Parent = Sidebar
+
+    -- Right edge border line on sidebar
+    local SidebarBorder = Instance.new("Frame")
+    SidebarBorder.Size             = UDim2.new(0, 1, 1, -52)
+    SidebarBorder.Position         = UDim2.new(0, SidebarW, 0, 52)
+    SidebarBorder.BackgroundColor3 = Theme.Border
+    SidebarBorder.BorderSizePixel  = 0
+    SidebarBorder.Parent           = Window
+
+    -- Tab list inside sidebar
+    local TabBar = Instance.new("Frame")
+    TabBar.Name                    = "TabBar"
+    TabBar.Size                    = UDim2.new(1, 0, 1, -80) -- leave room for watermark at bottom
+    TabBar.BackgroundTransparency  = 1
+    TabBar.BorderSizePixel         = 0
+    TabBar.ClipsDescendants        = false
+    TabBar.Parent                  = Sidebar
 
     local TabList = Instance.new("UIListLayout")
-    TabList.SortOrder         = Enum.SortOrder.LayoutOrder
-    TabList.FillDirection     = Enum.FillDirection.Vertical
-    TabList.HorizontalAlignment = Enum.HorizontalAlignment.Left
-    TabList.Padding           = UDim.new(0, 4)
-    TabList.Parent            = TabBar
+    TabList.SortOrder              = Enum.SortOrder.LayoutOrder
+    TabList.FillDirection          = Enum.FillDirection.Vertical
+    TabList.HorizontalAlignment    = Enum.HorizontalAlignment.Left
+    TabList.Padding                = UDim.new(0, 3)
+    TabList.Parent                 = TabBar
 
     local TabPadding = Instance.new("UIPadding")
-    TabPadding.PaddingTop   = UDim.new(0, 8)
-    TabPadding.PaddingLeft  = UDim.new(0, 6)
-    TabPadding.PaddingRight = UDim.new(0, 6)
-    TabPadding.Parent       = TabBar
+    TabPadding.PaddingTop          = UDim.new(0, 10)
+    TabPadding.PaddingLeft         = UDim.new(0, 8)
+    TabPadding.PaddingRight        = UDim.new(0, 8)
+    TabPadding.Parent              = TabBar
 
-    -- Divider between sidebar and content
-    local Divider = Instance.new("Frame")
-    Divider.Size             = UDim2.new(0, 1, 1, -48)
-    Divider.Position         = UDim2.new(0, 130, 0, 48)
-    Divider.BackgroundColor3 = Theme.Border
-    Divider.BorderSizePixel  = 0
-    Divider.Parent           = Window
+    -- ── Watermark at bottom of sidebar ────────────────────────
+    local WatermarkFrame = Instance.new("Frame")
+    WatermarkFrame.Size             = UDim2.new(1, 0, 0, 72)
+    WatermarkFrame.Position         = UDim2.new(0, 0, 1, -72)
+    WatermarkFrame.BackgroundTransparency = 1
+    WatermarkFrame.BorderSizePixel  = 0
+    WatermarkFrame.ClipsDescendants = false
+    WatermarkFrame.Parent           = Sidebar
+
+    -- Fade line above watermark
+    local WatermarkLine = Instance.new("Frame")
+    WatermarkLine.Size             = UDim2.new(1, -20, 0, 1)
+    WatermarkLine.Position         = UDim2.new(0, 10, 0, 0)
+    WatermarkLine.BackgroundColor3 = Theme.Border
+    WatermarkLine.BorderSizePixel  = 0
+    WatermarkLine.Parent           = WatermarkFrame
+
+    local PoweredByLabel = Instance.new("TextLabel")
+    PoweredByLabel.Text             = "powered by"
+    PoweredByLabel.Font             = Enum.Font.Gotham
+    PoweredByLabel.TextSize         = 9
+    PoweredByLabel.TextColor3       = Theme.TextMuted
+    PoweredByLabel.BackgroundTransparency = 1
+    PoweredByLabel.Size             = UDim2.new(1, 0, 0, 16)
+    PoweredByLabel.Position         = UDim2.new(0, 0, 0, 10)
+    PoweredByLabel.TextXAlignment   = Enum.TextXAlignment.Center
+    PoweredByLabel.Parent           = WatermarkFrame
+
+    local NexLogo = Instance.new("ImageLabel")
+    NexLogo.Image               = "rbxassetid://72070585390420"
+    NexLogo.Size                = UDim2.new(0, 36, 0, 36)
+    NexLogo.Position            = UDim2.new(0.5, -18, 0, 28)
+    NexLogo.BackgroundTransparency = 1
+    NexLogo.ImageColor3         = Theme.Accent
+    NexLogo.BorderSizePixel     = 0
+    NexLogo.Parent              = WatermarkFrame
 
     -- ── Content Area ──────────────────────────────────────────
     local ContentArea = Instance.new("Frame")
-    ContentArea.Name            = "ContentArea"
-    ContentArea.Size            = UDim2.new(1, -131, 1, -48)
-    ContentArea.Position        = UDim2.new(0, 131, 0, 48)
+    ContentArea.Name             = "ContentArea"
+    ContentArea.Size             = UDim2.new(1, -(SidebarW + 1), 1, -52)
+    ContentArea.Position         = UDim2.new(0, SidebarW + 1, 0, 52)
     ContentArea.BackgroundTransparency = 1
     ContentArea.ClipsDescendants = true
     ContentArea.Parent           = Window
+
+    -- ── Opening Animation ─────────────────────────────────────
+    task.spawn(function()
+        -- 1. Fade + slide window in
+        Tween(Window, {
+            BackgroundTransparency = 0,
+            Position = UDim2.new(position.X.Scale, position.X.Offset, position.Y.Scale, position.Y.Offset)
+        }, 0.35, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+
+        task.wait(0.2)
+
+        -- 2. Shimmer sweep across the accent top bar
+        Tween(Shimmer, { Position = UDim2.new(1.1, 0, 0, 0) }, 0.5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut)
+
+        task.wait(0.5)
+
+        -- Reset shimmer for next time (reuse on minimize/restore etc.)
+        Shimmer.Position = UDim2.new(-0.15, 0, 0, 0)
+    end)
 
     -- ── Window Object ─────────────────────────────────────────
     local WindowObj = {}
@@ -583,8 +742,6 @@ function NexUI:CreateWindow(config)
         TBPad.PaddingRight = UDim.new(0, 6)
         TBPad.Parent       = TabBtn
 
-        local TBLabel = TabBtn  -- reference for colour/font changes
-
         -- Tab Content Frame
         local TabFrame = Instance.new("ScrollingFrame")
         TabFrame.Name                = "TabFrame_" .. tabName
@@ -616,8 +773,6 @@ function NexUI:CreateWindow(config)
         local TabObj = {}
         TabObj._frame  = TabFrame
         TabObj._button = TabBtn
-        TabObj._label  = TBLabel
-        TabObj._icon   = tabIcon
         TabObj._order  = 0
         TabObj._window = WindowObj
 
